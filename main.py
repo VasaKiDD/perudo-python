@@ -7,7 +7,7 @@ if __name__ == "__main__":
     players = 0
     while players > 5 or players < 1:
         players = input("How many AI player (Accepted answer: 1-5) ?\n")
-        print("Player number must be between 1-5")
+        print("AiPlayer number must be between 1-5")
 
     dices = {}
     for i in range(players):
@@ -17,6 +17,6 @@ if __name__ == "__main__":
     print("Coosing randomly starting player.\n")
     starting_player = np.random.randint(players)
     if starting_player > 0:
-        print("Player {s} is starting")
+        print("AiPlayer {s} is starting")
     else:
         print("You start")
