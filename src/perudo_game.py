@@ -49,8 +49,36 @@ class PerudoGame:
             if self.players[player].status == "disqualified":
                 del self.players[player]
 
-    def bet_validity(self):
-        self.current_bet = 1
+    def bet_validity(self, new_bet):
+        if not isinstance(new_bet, str):
+            print("Your bet should be a string.")
+        # TODO: add a regex that check if the bet follow the style "{int}d{int}"
+        new_bet_values = new_bet.split("d")
+        new_bet_dice_nb = int(new_bet_values[0])
+        new_bet_dice_val = int(new_bet_values[1])
+
+        cur_bet_values = self.current_bet.split("d")
+        cur_bet_dice_nb = int(cur_bet_values[0])
+        cur_bet_dice_val = int(cur_bet_values[1])
+        valid_bet = True
+        if new_bet_dice_nb < cur_bet_dice_nb:
+            if new_bet_dice_val == 1:
+                if new_bet_dice_nb >= cur_bet_dice_nb//2:
+                    valid_bet = False
+                    print("if you want to bet on 1 the number of dice should at least be more"
+                          " than half the current number of dices.")
+            else:
+                valid_bet = False
+                print("if you want to bet then put more dices or a bigger value.")
+        elif new_bet_dice_nb == cur_bet_dice_nb:
+            if cur_bet_dice_val >= new_bet_dice_val:
+                valid_bet = False
+                print("if you want to bet then put more dices or a bigger value.")
+        else:
+            pass
+
+        if valid_bet:
+            self.current_bet = new_bet
 
     def play_round(self):
         self.current_bet = 1
