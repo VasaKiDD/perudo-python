@@ -38,7 +38,6 @@ class AiPlayer:
         :param
         """
         # TODO: code the decision making process for a player.
-        self.player_name = "bobby"
 
 
 

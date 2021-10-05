@@ -41,6 +41,14 @@ class PerudoGame:
                 for val in self.players["human"].current_roll:
                     self.current_state_play[val] += 1
 
+    def remove_disqualified(self):
+        """
+        Check the player list at the end of turn to remove all players with "disqualified" status.
+        """
+        for player in self.players.keys():
+            if self.players[player].status == "disqualified":
+                del self.players[player]
+
     def bet_validity(self):
         self.current_bet = 1
 

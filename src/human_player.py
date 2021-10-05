@@ -8,6 +8,7 @@ class Human:
         self.dice_number = 5
         self.current_roll = list()
         self.player_status = "in_game"
+        self.current_bet = "0d0"
 
     def get_name(self, ai_names):
         non_valid_name = True
@@ -45,5 +46,4 @@ class Human:
         """
         Compute the choice of the player, return either a new bet, "dudo" or "calza"
         """
-        # TODO: code the decision making process for a player.
-        self.name = "bobby"
+        
