@@ -3,7 +3,7 @@ import random
 
 class AiPlayer:
     def __init__(self, player_name):
-        self.player_name = player_name
+        self.name = player_name
         self.dice_number = 5
         self.current_roll = list()
         self.player_status = "in_game"
@@ -32,13 +32,17 @@ class AiPlayer:
         if self.dice_number == 0:
             self.player_status = "disqualified"
 
-    def make_choice(self, current_bet, state_of_game):
+    def player_wins_calza(self):
+        """
+        Update the attribute self.dice_number and self.player_status.
+        If the player wins calza and have less than 5 dices, he wins a dice.
+        """
+        if self.dice_number < 5:
+            self.dice_number += 1
+
+    def make_choice(self, current_bet, last_player):
         """
         Compute the choice of the player, return either a new bet, "dudo" or "calza"
         :param
         """
         # TODO: code the decision making process for a player.
-
-
-
-

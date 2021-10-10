@@ -23,10 +23,25 @@ def get_players_names(nb_player):
     :param nb_player: number of players in need of a name.
     :return
     """
-    name_list = ["Bobby", "Johny", "Suzan", "Karen", "Lauren", "Anthony", "David", "Isa", "Matthew", "Pablo", "Sofia"]
+    name_list = [
+        "Bobby",
+        "Johny",
+        "Suzan",
+        "Karen",
+        "Lauren",
+        "Anthony",
+        "Isa",
+        "Matthew",
+        "Pablo",
+        "Sofia",
+    ]
     if nb_player > len(name_list):
-        print("To many players not enough names, please choose a number of "
-              "players inferior to {} or add new names in the name_list of the function"
-              "'get_players_names' in the file 'utils/game_utils.py".format(len(name_list)))
+        print(
+            "To many players not enough names, please choose a number of "
+            "players inferior to {} or add new names in the name_list of the function"
+            "'get_players_names' in the file 'utils/game_utils.py".format(
+                len(name_list)
+            )
+        )
     player_name = random.sample(name_list, nb_player)
     return player_name
