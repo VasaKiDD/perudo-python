@@ -1,14 +1,14 @@
 import time
 import random
+import re
+
+from src.player import Player
 
 
-class Human:
+class Human(Player):
     def __init__(self):
-        self.name = "Napoleon"
-        self.dice_number = 5
-        self.current_roll = list()
-        self.player_status = "in_game"
-        self.current_bet = "0d0"
+        super(Human, self).__init__("")
+        self.name = ""
 
     def get_name(self, ai_names):
         non_valid_name = True
@@ -32,31 +32,66 @@ class Human:
                 )
             )
 
-    def get_human_roll(self):
-        print("Rolling your dices...")
-        time.sleep(5)
+    def player_roll_result(self):
+        dices_str = "Your dices are: "
         for i in range(self.dice_number):
             roll = random.randint(1, 6)
+            dices_str += str(roll) + " "
             self.current_roll.append(roll)
+        print(dices_str)
 
-    def player_fails(self):
-        """
-        Update the attribute self.dice_number and self.player_status.
-        If the player loose his last dice his status will be "disqualified".
-        """
-        self.dice_number -= 1
-        if self.dice_number == 0:
-            self.player_status = "disqualified"
-
-    def player_wins_calza(self):
-        """
-        Update the attribute self.dice_number and self.player_status.
-        If the player wins calza and have less than 5 dices, he wins a dice.
-        """
-        if self.dice_number < 5:
-            self.dice_number += 1
-
-    def make_choice(self, current_bet, last_player):
+    def make_choice(self, bets, dices):
         """
         Compute the choice of the player, return either a new bet, "dudo" or "calza"
         """
+
+        rule = "([0-9]+)d([0-9]+)"
+
+        b = "First" if bets == [] else bets[-1]
+        s = ("Current Bet: {b}\n" "Current Dices: {d}").format(
+            b=b, d=self.current_roll
+        )
+        print(s)
+
+        if bets == []:
+            valid = True
+            action = "accept"
+        else:
+            valid = False
+            action = ""
+
+        while not valid:
+            question = (
+                "What is your action ?\n"
+                "Possible answers : dudo, calza or accept\n"
+                "Answer:"
+            )
+            action = input(question)
+            valid = (
+                (action.lower() == "dudo")
+                or (action.lower() == "calza")
+                or (action.lower() == "accept")
+            )
+            if not valid:
+                print("ActionError: action doesn't exist")
+
+        bet = ""
+        if action == "accept":
+            valid = False
+            while not valid:
+                question = (
+                    "What is your raise ? <number of dice>d<dice value>\n"
+                    "Exemple: 5 dices of 6 <=> 5d6\n"
+                    "Answer:"
+                )
+                bet = input(question)
+                valid = re.match(rule, bet.lower()) is not None
+                if valid and bets == []:
+                    if int(bet.lower().split("d")[1]) == 1:
+                        print("BetError: You can't start by betting dudos !")
+                        valid = False
+                if valid and int(bet.lower().split("d")[1]) > 6:
+                    print("BetError: Max dice value is 6")
+                    valid = False
+
+        return action, bet

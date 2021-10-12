@@ -3,6 +3,8 @@ from src.perudo_game import PerudoGame
 import time
 
 if __name__ == "__main__":
+    sleep_time = 0
+
     print("-----Welcome to the Perudo Game-----")
 
     players = 0
