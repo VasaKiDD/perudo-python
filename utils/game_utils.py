@@ -3,7 +3,8 @@ import random
 
 def player_starting(players_names):
     """
-    Simulate a dice roll for every player and return the name of the player who reached the higher score first.
+    Simulate a dice roll for every player and return the name of the player
+    who reached the higher score first.
     :param players_names: list of the players' names.
     :return starting_player: name of the player that starts.
     """
@@ -38,7 +39,8 @@ def get_players_names(nb_player):
     if nb_player > len(name_list):
         print(
             "To many players not enough names, please choose a number of "
-            "players inferior to {} or add new names in the name_list of the function"
+            "players inferior to {} or add new names in the name_list of the "
+            "function"
             "'get_players_names' in the file 'utils/game_utils.py".format(
                 len(name_list)
             )

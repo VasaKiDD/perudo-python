@@ -1,4 +1,3 @@
-import time
 import random
 import re
 
@@ -19,7 +18,8 @@ class Human(Player):
                 print("Your name is too long")
             elif temp_name in ai_names:
                 print(
-                    "already a player named like that, choose another name please."
+                    "already a player named like that, choose another "
+                    "name please."
                 )
             else:
                 human_name = temp_name
@@ -42,18 +42,19 @@ class Human(Player):
 
     def make_choice(self, bets, dices):
         """
-        Compute the choice of the player, return either a new bet, "dudo" or "calza"
+        Compute the choice of the player, return either a new bet, "dudo"
+        or "calza"
         """
 
         rule = "([0-9]+)d([0-9]+)"
 
         b = "First" if bets == [] else bets[-1]
-        s = ("Current Bet: {b}\n" "Current Dices: {d}").format(
+        s = "Current Bet: {b}\n" "Current Dices: {d}".format(
             b=b, d=self.current_roll
         )
         print(s)
 
-        if bets == []:
+        if not bets:
             valid = True
             action = "accept"
         else:

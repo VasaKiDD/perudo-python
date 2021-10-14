@@ -1,17 +1,15 @@
-import re
 import random
 import time
-import math
 
 from src.player import Player
 from src.human_player import Human
-from utils.game_utils import player_starting, get_players_names
+from utils.game_utils import get_players_names
 
 sleep_time = 0
 
 
 class PerudoGame:
-    def __init__(self, nb_player):
+    def __init__(self, nb_player, no_human=False):
         self.nb_player = nb_player
         self.players = dict()
         self.looser = list()
@@ -20,6 +18,7 @@ class PerudoGame:
         self.rotation = None
         self.d_dices = None
         self.max_bet = None
+        self.no_human = no_human
 
     def update_max_bet(self):
         self.d_dices = {}
@@ -40,15 +39,18 @@ class PerudoGame:
 
     def players_initialization(self):
         """
-        Generate an instance of the class AiPlayer for the self.nb_player players.
+        Generate an instance of the class AiPlayer for the self.nb_player
+        players.
         """
         players_names = get_players_names(self.nb_player)
         for name in players_names:
             self.players[name] = Player(name)
-        print("Your opponents are: {}".format(players_names))
-        human = Human()
-        human.get_name(players_names)
-        self.players["human"] = human
+        print("Opponents are: {}".format(players_names))
+
+        if not self.no_human:
+            human = Human()
+            human.get_name(players_names)
+            self.players["human"] = human
         self.rotation = list(self.players.keys())
         print("Rolling the dice for the starting player...")
         random.shuffle(self.rotation)
@@ -59,7 +61,7 @@ class PerudoGame:
             order += self.players[player].name + "->"
         print(order)
         time.sleep(sleep_time)
-        self.start_player = 0
+        self.start_player = self.rotation[0]
         self.update_max_bet()
 
     def round_roll(self):
@@ -76,16 +78,26 @@ class PerudoGame:
 
     def remove_disqualified(self):
         """
-        Check the player list at the end of turn to remove all players with "disqualified" status.
+        Check the player list at the end of turn to remove all players with
+        "disqualified" status.
         """
         for player in self.players.keys():
             if self.players[player].player_status == "disqualified":
                 if player == "human":
                     return True
                 del self.players[player]
+                if self.start_player == player:
+                    ix = self.rotation.index(player)
+                    if ix < len(self.rotation) - 1:
+                        self.start_player = self.rotation[ix + 1]
+                    else:
+                        self.start_player = self.rotation[0]
+                self.rotation.remove(player)
                 self.nb_player -= 1
-        self.rotation = list(self.players.keys())
-        random.shuffle(self.rotation)
+                if self.nb_player == 0:
+                    return True
+                break
+
         order = "The order is: "
         for player in self.rotation:
             order += self.players[player].name + "->"
@@ -99,13 +111,15 @@ class PerudoGame:
         if bet_dice_val == 1:
             if bet_dice_nb > max_dice:
                 print(
-                    "BetError: You bet more dices than possible dices. Do the Math !"
+                    "BetError: You bet more dices than possible dices. "
+                    "Do the Math !"
                 )
                 return False
         else:
             if bet_dice_nb > 2 * max_dice:
                 print(
-                    "BetError: You bet more dices than possible dices. Do the Math !"
+                    "BetError: You bet more dices than possible dices. "
+                    "Do the Math !"
                 )
                 return False
 
@@ -128,15 +142,17 @@ class PerudoGame:
                 if new_bet_dice_val == 1:
                     if not new_bet_dice_nb > cur_bet_dice_nb:
                         print(
-                            "BetError: You put less pacos dices than current paco dices"
+                            "BetError: You put less pacos dices than current "
+                            "paco dices"
                         )
                         return False
                     else:
                         return True
                 else:
-                    if not new_bet_dice_nb > cur_bet_dice_nb * 2 + 1:
+                    if not new_bet_dice_nb >= cur_bet_dice_nb * 2 + 1:
                         print(
-                            "BetError: You put less dices than 2 times the non paco value"
+                            "BetError: You put less dices than 2 times the "
+                            "non paco value"
                         )
                         return False
                     else:
@@ -145,7 +161,8 @@ class PerudoGame:
                 if new_bet_dice_val == 1:
                     if not new_bet_dice_nb >= cur_bet_dice_nb // 2 + 1:
                         print(
-                            "BetError: You put less dices than 2 times the half of current value"
+                            "BetError: You put less dices than 2 times the "
+                            "half of current value"
                         )
                         return False
                     else:
@@ -156,7 +173,8 @@ class PerudoGame:
                         or (new_bet_dice_val > cur_bet_dice_val)
                     ):
                         print(
-                            "BetError: You put less or equal dices than current amount of dices",
+                            "BetError: You put less or equal dices than "
+                            "current amount of dices",
                             " or a less or equal not paco number",
                         )
                         return False
@@ -166,16 +184,17 @@ class PerudoGame:
         return True
 
     def dudo(self, current_bet, current_player, last_player):
+        # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
         cur_bet_dice_val = int(cur_bet_values[1])
         if cur_bet_dice_val == 1:
             if cur_bet_dice_nb >= self.current_state_play[1]:
                 self.players[self.rotation[last_player]].player_fails()
-                self.start_player = current_player
+                self.start_player = self.rotation[current_player]
             else:
                 self.players[self.rotation[current_player]].player_fails()
-                self.start_player = last_player
+                self.start_player = self.rotation[last_player]
         else:
             if (
                 cur_bet_dice_nb
@@ -183,33 +202,45 @@ class PerudoGame:
                 + self.current_state_play[cur_bet_dice_val]
             ):
                 self.players[self.rotation[last_player]].player_fails()
-                self.start_player = current_player
+                self.start_player = self.rotation[current_player]
             else:
                 self.players[self.rotation[current_player]].player_fails()
-                self.start_player = last_player
+                self.start_player = self.rotation[last_player]
 
     def calza(self, current_bet, current_player):
+        # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
         cur_bet_dice_val = int(cur_bet_values[1])
+
         if (
-            cur_bet_dice_nb
-            == self.current_state_play[1]
+            self.current_state_play[cur_bet_dice_val]
+            <= cur_bet_dice_nb
+            <= self.current_state_play[1]
             + self.current_state_play[cur_bet_dice_val]
         ):
             self.players[self.rotation[current_player]].player_wins_calza()
-            self.start_player = current_player
+            self.start_player = self.rotation[current_player]
+        else:
+            self.players[self.rotation[current_player]].player_fails()
+            self.start_player = self.rotation[current_player]
 
     def play_round(self):
         self.round_roll()
         current_bet = None
         bet_history = []
         last_player = 0
-        current_player = self.start_player
+        current_player = self.rotation.index(self.start_player)
         end_round = False
-        first = True
         while not end_round:
-            print(self.players[self.rotation[current_player]].name, " speaks")
+            try:
+                print(
+                    self.players[self.rotation[current_player]].name, " speaks"
+                )
+            except:
+                import pdb
+
+                pdb.set_trace()
             action, new_bet = self.players[
                 self.rotation[current_player]
             ].make_choice(bet_history, self.d_dices)
@@ -230,10 +261,15 @@ class PerudoGame:
                 current_bet = new_bet
                 current_player = (
                     current_player + 1
-                    if current_player < len(self.rotation)
+                    if current_player < len(self.rotation) - 1
                     else 0
                 )
                 if current_bet == self.max_bet:
+                    print(
+                        "{p} calls dudo".format(
+                            p=self.rotation[current_player]
+                        )
+                    )
                     self.dudo(current_bet, current_player, last_player)
                     end_round = True
             elif action == "dudo":
@@ -255,3 +291,9 @@ class PerudoGame:
         while not game_end:
             self.play_round()
             game_end = self.remove_disqualified()
+
+        if self.nb_player == 0:
+            if self.no_human:
+                print("Last Player Wins")
+            else:
+                print("Congrats, you won !")
