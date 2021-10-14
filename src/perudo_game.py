@@ -106,7 +106,9 @@ class PerudoGame:
         return False
 
     def bet_values_check(self, bet_dice_nb, bet_dice_val):
-
+        """
+        Check the validiy of one bet alone.
+        """
         max_dice = sum(self.d_dices.values())
         if bet_dice_val == 1:
             if bet_dice_nb > max_dice:
@@ -126,7 +128,10 @@ class PerudoGame:
         return True
 
     def bet_validity(self, new_bet, current_bet):
-
+        """
+        Check all the rules for the perudo game betting system by confronting
+        new_bet with current bet
+        """
         new_bet_dice_nb, new_bet_dice_val = [
             int(val) for val in new_bet.split("d")
         ]
@@ -184,6 +189,10 @@ class PerudoGame:
         return True
 
     def dudo(self, current_bet, current_player, last_player):
+        """
+        This is a function when current player calls dudo on last player. It
+        will check who wins the dudo and update dices.
+        """
         # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
@@ -208,6 +217,10 @@ class PerudoGame:
                 self.start_player = self.rotation[last_player]
 
     def calza(self, current_bet, current_player):
+        """
+        This is a function when current player calls calza. It
+        will check if he wins the calza and update his dices
+        """
         # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
@@ -226,6 +239,9 @@ class PerudoGame:
             self.start_player = self.rotation[current_player]
 
     def play_round(self):
+        """
+        Function handling one round of a play
+        """
         self.round_roll()
         current_bet = None
         bet_history = []
@@ -286,6 +302,9 @@ class PerudoGame:
                 print("!!!! Action Error !!!!")
 
     def play_game(self):
+        """
+        Function handling one play of the game between players
+        """
         self.players_initialization()
         game_end = False
         while not game_end:

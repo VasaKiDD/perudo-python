@@ -42,7 +42,7 @@ class Human(Player):
 
     def make_choice(self, bets, dices):
         """
-        Compute the choice of the player, return either a new bet, "dudo"
+        Compute the choice of the human player, return either a new bet, "dudo"
         or "calza"
         """
 

@@ -85,6 +85,10 @@ class Player:
         return probs
 
     def make_choice(self, bets, dices):
+        """
+        This is the mathematical/AI decision part of an AI player with
+        bayesian reasonning, expectation maximisation and bluff.
+        """
 
         total_dices = sum(dices.values())
         posteriors = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) / 6.0
