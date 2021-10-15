@@ -5,7 +5,7 @@ from src.player import Player
 from src.human_player import Human
 from utils.game_utils import get_players_names
 
-sleep_time = 3
+sleep_time = 0
 
 
 class PerudoGame:
@@ -247,6 +247,15 @@ class PerudoGame:
             self.start_player = self.rotation[current_player]
         time.sleep(sleep_time)
 
+    def update_players_trust(self, bet_history):
+        player_dices = []
+        for name, player_instance in self.players.items():
+            player_dices.append((name, player_instance.current_roll))
+        for player_instance in self.players.values():
+            player_instance.update_trust(
+                bet_history, player_dices, self.current_state_play
+            )
+
     def play_round(self):
         """
         Function handling one round of a play
@@ -311,6 +320,7 @@ class PerudoGame:
                 end_round = True
             else:
                 print("!!!! Action Error !!!!")
+        self.update_players_trust(bet_history)
 
     def play_game(self):
         """

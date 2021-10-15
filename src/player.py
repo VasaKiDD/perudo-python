@@ -10,10 +10,11 @@ class Player:
         self.current_roll = list()
         self.player_status = "in_game"
         self.trust = {}
-        self.risk_taking = 1.0
-        self.bluff_factor = 0.7
-        self.init_trust = 20.0
-        self.tilt_gamma = 0.95
+        self.risk_taking = random.random()
+        self.bluff_factor = random.random() * 0.5
+        self.init_trust = 25.0 * random.random()
+        self.tilt_gamma = 0.9
+        self.trust_loss = 0.5
         self.distrib = np.zeros(6)
 
     def player_roll_result(self):
@@ -115,8 +116,14 @@ class Player:
             alpha = dices[player] / p_total_dices
             posteriors = posteriors * (1.0 - alpha) + player_distrib * alpha
 
-        alpha = dices[self.name] / total_dices
-        posteriors = posteriors * (1.0 - alpha) + self.distrib * alpha
+        if random.random() < self.bluff_factor:
+            distrib = np.array([5, 0, 1, 2, 3, 4])
+            distrib = np.exp(distrib) / np.exp(distrib).sum()
+            distrib = np.random.multinomial(self.dice_number, distrib)
+        else:
+            distrib = self.distrib
+        alpha = self.dice_number / total_dices
+        posteriors = posteriors * (1.0 - alpha) + distrib * alpha
         # print(posteriors)
         posteriors[1:] *= 2.0
         distribution = posteriors / posteriors.sum()
@@ -143,20 +150,6 @@ class Player:
 
             probs = self.calculate_probs(val, nb, total_dices, distribution)
 
-            # Bluff Decision
-            utility = (
-                probs[:, 0] / total_dices + probs[:, 1] / 6 + probs[:, 2]
-            ) / 3.0
-            max_utility = np.argmax(utility)
-            if utility.max() > self.bluff_factor:
-                # print("=====================> Bluff", utility.max())
-                my_bet = (
-                    str(int(probs[max_utility, 0]))
-                    + "d"
-                    + str(int(probs[max_utility, 1] + 1))
-                )
-                return "accept", my_bet
-
             # Rational Decision
             max_win_arg = np.argmax(probs[:, 2])
             if (
@@ -174,25 +167,6 @@ class Player:
         else:
             probs = self.calculate_probs(1, 0, total_dices, distribution)
 
-            # Bluff Decision
-            utility = (
-                probs[:, 0] / total_dices + probs[:, 1] / 6 + probs[:, 2]
-            ) / 3.0
-            utility /= 3
-            args_utility = np.argsort(utility)
-            if probs[args_utility[-1], 1] == 0:
-                max_utility = args_utility[-2]
-            else:
-                max_utility = args_utility[-1]
-            if utility.max() > self.bluff_factor:
-                # print("=====================> Bluff", utility.max())
-                my_bet = (
-                    str(int(probs[max_utility, 0]))
-                    + "d"
-                    + str(int(probs[max_utility, 1] + 1))
-                )
-                return "accept", my_bet
-
             # Rationnal Decision
             args_probs = np.argsort(probs[:, 2])
             if probs[args_probs[-1], 1] == 0:
@@ -205,3 +179,6 @@ class Player:
                 + str(int(probs[max_win_arg, 1] + 1))
             )
             return "accept", my_bet
+
+    def update_trust(self, bets, dices, current_state):
+        pass
