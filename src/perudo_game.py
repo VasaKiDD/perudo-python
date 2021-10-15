@@ -270,7 +270,6 @@ class PerudoGame:
         real = np.zeros(6)
         for val, nb in self.current_state_play.items():
             real[val - 1] += nb
-        real[1:] *= 2.0
         real = real / real.sum()
         # print("real :", real)
         # print("posteriors :", distributions)
@@ -290,12 +289,12 @@ class PerudoGame:
         while not end_round:
             action, new_bet = self.players[
                 self.rotation[current_player]
-            ].make_choice(bet_history[-n_p:], self.d_dices)
+            ].make_choice(bet_history, self.d_dices)
             if action == "accept":
                 while not self.bet_validity(new_bet, current_bet):
                     action, new_bet = self.players[
                         self.rotation[current_player]
-                    ].make_choice(bet_history[-n_p:], self.d_dices)
+                    ].make_choice(bet_history, self.d_dices)
                 print(
                     "{p} accepts and bets {n} dices of value {v}".format(
                         p=self.players[self.rotation[current_player]].name,
