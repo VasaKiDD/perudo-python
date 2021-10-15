@@ -93,7 +93,9 @@ class PerudoGame:
                         self.start_player = self.rotation[0]
                 self.rotation.remove(player)
                 self.nb_player -= 1
-                if self.nb_player == 0:
+                if self.no_human and self.nb_player == 1:
+                    return True
+                if not self.no_human and self.nb_player == 0:
                     return True
                 break
 
@@ -338,8 +340,12 @@ class PerudoGame:
             self.play_round()
             game_end = self.remove_disqualified()
 
-        if self.nb_player == 0:
-            if self.no_human:
-                print("Last Player Wins")
-            else:
-                print("Congrats, you won !")
+        if self.no_human:
+            print(self.rotation[-1], "Wins !")
+            print("risk taking:", self.players[self.rotation[-1]].risk_taking)
+            print(
+                "bluff factor:", self.players[self.rotation[-1]].bluff_factor
+            )
+            print("initial trust:", self.players[self.rotation[-1]].init_trust)
+        else:
+            print("Congrats, you won !")
