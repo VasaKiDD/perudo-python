@@ -1,6 +1,8 @@
 import random
 import time
 
+import numpy as np
+
 from src.player import Player
 from src.human_player import Human
 from utils.game_utils import get_players_names
@@ -256,12 +258,23 @@ class PerudoGame:
 
     def update_players_trust(self, bet_history):
         player_dices = []
+        distributions = np.zeros(6)
         for name, player_instance in self.players.items():
             player_dices.append((name, player_instance.current_roll))
         for player_instance in self.players.values():
+            distributions += player_instance.posteriors
             player_instance.update_trust(
                 bet_history, player_dices, self.current_state_play
             )
+        distributions = distributions / distributions.sum()
+        real = np.zeros(6)
+        for val, nb in self.current_state_play.items():
+            real[val - 1] += nb
+        real[1:] *= 2.0
+        real = real / real.sum()
+        # print("real :", real)
+        # print("posteriors :", distributions)
+        # import pdb; pdb.set_trace()
 
     def play_round(self):
         """

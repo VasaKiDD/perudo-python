@@ -12,7 +12,7 @@ class Player:
         self.trust = {}
         self.risk_taking = random.random()
         self.bluff_factor = random.random() * 0.5
-        self.init_trust = 25.0 * random.random()
+        self.init_trust = 25.0 # * random.random()
         self.tilt_gamma = 0.9
         self.trust_loss = 0.5
         self.distrib = np.zeros(6)
@@ -91,7 +91,6 @@ class Player:
         This is the mathematical/AI decision part of an AI player with
         bayesian reasonning, expectation maximisation and bluff.
         """
-
         total_dices = sum(dices.values())
         p_total_dices = total_dices - self.dice_number
         for bet in bets:
@@ -107,13 +106,14 @@ class Player:
             if val == 0:
                 player_distrib[val] = nb
             else:
-                player_distrib[val] = nb / 2.0
-                player_distrib[0] = nb / 2.0
+                player_distrib[val] = nb
+                player_distrib[0] = nb
             # trust in player is temperature in softmax function
             player_distrib *= self.trust[player]
             player_distrib = np.exp(player_distrib)
             player_distrib /= player_distrib.sum()
             alpha = dices[player] / p_total_dices
+            alpha = 0.0
             self.posteriors = (
                 self.posteriors * (1.0 - alpha) + player_distrib * alpha
             )
