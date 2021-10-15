@@ -5,11 +5,9 @@ from src.player import Player
 from src.human_player import Human
 from utils.game_utils import get_players_names
 
-sleep_time = 0
-
 
 class PerudoGame:
-    def __init__(self, nb_player, no_human=False):
+    def __init__(self, nb_player, no_human=False, sleep_time=3):
         self.nb_player = nb_player
         self.players = dict()
         self.looser = list()
@@ -19,6 +17,7 @@ class PerudoGame:
         self.d_dices = None
         self.max_bet = None
         self.no_human = no_human
+        self.sleep_time = sleep_time
 
     def update_max_bet(self):
         self.d_dices = {}
@@ -30,7 +29,7 @@ class PerudoGame:
                 ":",
                 self.players[player].dice_number,
             )
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
         self.d_dices = {
             player: self.players[player].dice_number
             for player in self.players.keys()
@@ -54,13 +53,13 @@ class PerudoGame:
         self.rotation = list(self.players.keys())
         print("Rolling the dice for the starting player...")
         random.shuffle(self.rotation)
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
         print(self.rotation[0], " starts to speak in the first round !")
         order = "The order is: "
         for player in self.rotation:
             order += self.players[player].name + "->"
         print(order)
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
         self.start_player = self.rotation[0]
         self.update_max_bet()
 
@@ -69,7 +68,7 @@ class PerudoGame:
         Dice roll for every players.
         """
         print("Everybody roll their dices...")
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
         self.current_state_play = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         for player in self.players.keys():
             self.players[player].player_roll_result()
@@ -148,7 +147,7 @@ class PerudoGame:
                     if not new_bet_dice_nb > cur_bet_dice_nb:
                         print(
                             "BetError: You put less pacos dices than current "
-                            "paco dices"
+                            "paco dices" + new_bet + " " + current_bet
                         )
                         return False
                     else:
@@ -157,7 +156,7 @@ class PerudoGame:
                     if not new_bet_dice_nb >= cur_bet_dice_nb * 2 + 1:
                         print(
                             "BetError: You put less dices than 2 times the "
-                            "non paco value"
+                            "non paco value" + new_bet + " " + current_bet
                         )
                         return False
                     else:
@@ -168,6 +167,9 @@ class PerudoGame:
                         print(
                             "BetError: You put less dices than 2 times the "
                             "half of current value"
+                            + new_bet
+                            + " "
+                            + current_bet
                         )
                         return False
                     else:
@@ -179,8 +181,11 @@ class PerudoGame:
                     ):
                         print(
                             "BetError: You put less or equal dices than "
-                            "current amount of dices",
-                            " or a less or equal not paco number",
+                            "current amount of dices"
+                            " or a less or equal not paco number"
+                            + new_bet
+                            + " "
+                            + current_bet
                         )
                         return False
                     else:
@@ -195,7 +200,7 @@ class PerudoGame:
         """
 
         print("Let's reveal the dices :", self.current_state_play)
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
 
         # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
@@ -219,7 +224,7 @@ class PerudoGame:
             else:
                 self.players[self.rotation[current_player]].player_fails()
                 self.start_player = self.rotation[last_player]
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
 
     def calza(self, current_bet, current_player):
         """
@@ -232,7 +237,7 @@ class PerudoGame:
         cur_bet_dice_val = int(cur_bet_values[1])
 
         print("Let's reveal the dices :", self.current_state_play)
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
 
         if (
             self.current_state_play[cur_bet_dice_val]
@@ -245,7 +250,7 @@ class PerudoGame:
         else:
             self.players[self.rotation[current_player]].player_fails()
             self.start_player = self.rotation[current_player]
-        time.sleep(sleep_time)
+        time.sleep(self.sleep_time)
 
     def update_players_trust(self, bet_history):
         player_dices = []
@@ -266,15 +271,16 @@ class PerudoGame:
         last_player = 0
         current_player = self.rotation.index(self.start_player)
         end_round = False
+        n_p = len(self.rotation) - 1
         while not end_round:
             action, new_bet = self.players[
                 self.rotation[current_player]
-            ].make_choice(bet_history, self.d_dices)
+            ].make_choice(bet_history[-n_p:], self.d_dices)
             if action == "accept":
                 while not self.bet_validity(new_bet, current_bet):
                     action, new_bet = self.players[
                         self.rotation[current_player]
-                    ].make_choice(bet_history, self.d_dices)
+                    ].make_choice(bet_history[-n_p:], self.d_dices)
                 print(
                     "{p} accepts and bets {n} dices of value {v}".format(
                         p=self.players[self.rotation[current_player]].name,
@@ -282,7 +288,7 @@ class PerudoGame:
                         v=new_bet.split("d")[1],
                     )
                 )
-                time.sleep(sleep_time)
+                time.sleep(self.sleep_time)
                 bet_history.append((self.rotation[current_player], new_bet))
                 last_player = current_player
                 current_bet = new_bet
@@ -297,7 +303,7 @@ class PerudoGame:
                             p=self.rotation[current_player]
                         )
                     )
-                    time.sleep(sleep_time)
+                    time.sleep(self.sleep_time)
                     self.dudo(current_bet, current_player, last_player)
                     end_round = True
             elif action == "dudo":
@@ -306,7 +312,7 @@ class PerudoGame:
                         p=self.players[self.rotation[current_player]].name
                     )
                 )
-                time.sleep(sleep_time)
+                time.sleep(self.sleep_time)
                 self.dudo(current_bet, current_player, last_player)
                 end_round = True
             elif action == "calza":
@@ -315,7 +321,7 @@ class PerudoGame:
                         p=self.players[self.rotation[current_player]].name
                     )
                 )
-                time.sleep(sleep_time)
+                time.sleep(self.sleep_time)
                 self.calza(current_bet, current_player)
                 end_round = True
             else:

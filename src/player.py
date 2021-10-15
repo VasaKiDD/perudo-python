@@ -16,6 +16,7 @@ class Player:
         self.tilt_gamma = 0.9
         self.trust_loss = 0.5
         self.distrib = np.zeros(6)
+        self.posteriors = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) / 6.0
 
     def player_roll_result(self):
         """
@@ -92,7 +93,6 @@ class Player:
         """
 
         total_dices = sum(dices.values())
-        posteriors = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) / 6.0
         p_total_dices = total_dices - self.dice_number
         for bet in bets:
             player, bet = bet
@@ -114,8 +114,11 @@ class Player:
             player_distrib = np.exp(player_distrib)
             player_distrib /= player_distrib.sum()
             alpha = dices[player] / p_total_dices
-            posteriors = posteriors * (1.0 - alpha) + player_distrib * alpha
+            self.posteriors = (
+                self.posteriors * (1.0 - alpha) + player_distrib * alpha
+            )
 
+        # bluff part
         if random.random() < self.bluff_factor:
             distrib = np.array([5, 0, 1, 2, 3, 4])
             distrib = np.exp(distrib) / np.exp(distrib).sum()
@@ -123,7 +126,7 @@ class Player:
         else:
             distrib = self.distrib
         alpha = self.dice_number / total_dices
-        posteriors = posteriors * (1.0 - alpha) + distrib * alpha
+        posteriors = self.posteriors * (1.0 - alpha) + distrib * alpha
         # print(posteriors)
         posteriors[1:] *= 2.0
         distribution = posteriors / posteriors.sum()
@@ -181,4 +184,4 @@ class Player:
             return "accept", my_bet
 
     def update_trust(self, bets, dices, current_state):
-        pass
+        self.posteriors = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) / 6.0

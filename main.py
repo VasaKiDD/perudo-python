@@ -8,12 +8,10 @@ if __name__ == "__main__":
     parser.add_argument("--no-human", action="store_true")
     parser.add_argument("--players", type=int, default=6)
 
-    sleep_time = 0
-
     args = parser.parse_args()
 
     if args.no_human:
-        game = PerudoGame(args.players, no_human=True)
+        game = PerudoGame(args.players, no_human=True, sleep_time=0.0)
         game.play_game()
 
     else:

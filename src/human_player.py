@@ -1,5 +1,6 @@
 import random
 import re
+import sys
 
 from src.player import Player
 
@@ -68,10 +69,12 @@ class Human(Player):
                 (action.lower() == "dudo")
                 or (action.lower() == "calza")
                 or (action.lower() == "accept")
+                or (action.lower() == "exit")
             )
             if not valid:
                 print("ActionError: action doesn't exist")
-
+        if action == "exit":
+            sys.exit()
         bet = ""
         if action == "accept":
             valid = False
