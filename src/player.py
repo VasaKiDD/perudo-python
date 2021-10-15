@@ -11,7 +11,7 @@ class Player:
         self.player_status = "in_game"
         self.trust = {}
         self.risk_taking = 1.0
-        self.bluff_factor = 1.0
+        self.bluff_factor = 0.7
         self.init_trust = 20.0
         self.tilt_gamma = 0.95
         self.distrib = np.zeros(6)
@@ -23,12 +23,12 @@ class Player:
         the attribute self.current_roll.
         """
         # initialization of the current_roll attribute
-        self.current_roll = [0] * self.dice_number
+        self.current_roll = []
         # simulation of the new roll of self.dice_number dices
         self.distrib = np.zeros(6)
         for i in range(self.dice_number):
             roll = random.randint(1, 6)
-            self.current_roll[i] = roll
+            self.current_roll.append(roll)
             self.distrib[roll - 1] += 1.0
         self.distrib /= self.distrib.sum()
         # no return because we updated the attribute self.current_roll

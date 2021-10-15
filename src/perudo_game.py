@@ -5,7 +5,7 @@ from src.player import Player
 from src.human_player import Human
 from utils.game_utils import get_players_names
 
-sleep_time = 0
+sleep_time = 3
 
 
 class PerudoGame:
@@ -193,6 +193,10 @@ class PerudoGame:
         This is a function when current player calls dudo on last player. It
         will check who wins the dudo and update dices.
         """
+
+        print("Let's reveal the dices :", self.current_state_play)
+        time.sleep(sleep_time)
+
         # print(self.current_state_play)
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
@@ -215,6 +219,7 @@ class PerudoGame:
             else:
                 self.players[self.rotation[current_player]].player_fails()
                 self.start_player = self.rotation[last_player]
+        time.sleep(sleep_time)
 
     def calza(self, current_bet, current_player):
         """
@@ -225,6 +230,9 @@ class PerudoGame:
         cur_bet_values = current_bet.split("d")
         cur_bet_dice_nb = int(cur_bet_values[0])
         cur_bet_dice_val = int(cur_bet_values[1])
+
+        print("Let's reveal the dices :", self.current_state_play)
+        time.sleep(sleep_time)
 
         if (
             self.current_state_play[cur_bet_dice_val]
@@ -237,6 +245,7 @@ class PerudoGame:
         else:
             self.players[self.rotation[current_player]].player_fails()
             self.start_player = self.rotation[current_player]
+        time.sleep(sleep_time)
 
     def play_round(self):
         """
@@ -249,14 +258,6 @@ class PerudoGame:
         current_player = self.rotation.index(self.start_player)
         end_round = False
         while not end_round:
-            try:
-                print(
-                    self.players[self.rotation[current_player]].name, " speaks"
-                )
-            except:
-                import pdb
-
-                pdb.set_trace()
             action, new_bet = self.players[
                 self.rotation[current_player]
             ].make_choice(bet_history, self.d_dices)
@@ -272,6 +273,7 @@ class PerudoGame:
                         v=new_bet.split("d")[1],
                     )
                 )
+                time.sleep(sleep_time)
                 bet_history.append((self.rotation[current_player], new_bet))
                 last_player = current_player
                 current_bet = new_bet
@@ -286,16 +288,25 @@ class PerudoGame:
                             p=self.rotation[current_player]
                         )
                     )
+                    time.sleep(sleep_time)
                     self.dudo(current_bet, current_player, last_player)
                     end_round = True
             elif action == "dudo":
-                print("{p} calls dudo".format(p=self.rotation[current_player]))
+                print(
+                    "{p} calls dudo".format(
+                        p=self.players[self.rotation[current_player]].name
+                    )
+                )
+                time.sleep(sleep_time)
                 self.dudo(current_bet, current_player, last_player)
                 end_round = True
             elif action == "calza":
                 print(
-                    "{p} calls calza".format(p=self.rotation[current_player])
+                    "{p} calls calza".format(
+                        p=self.players[self.rotation[current_player]].name
+                    )
                 )
+                time.sleep(sleep_time)
                 self.calza(current_bet, current_player)
                 end_round = True
             else:

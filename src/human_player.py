@@ -33,12 +33,10 @@ class Human(Player):
             )
 
     def player_roll_result(self):
-        dices_str = "Your dices are: "
+        self.current_roll = []
         for i in range(self.dice_number):
             roll = random.randint(1, 6)
-            dices_str += str(roll) + " "
             self.current_roll.append(roll)
-        print(dices_str)
 
     def make_choice(self, bets, dices):
         """
@@ -49,9 +47,7 @@ class Human(Player):
         rule = "([0-9]+)d([0-9]+)"
 
         b = "First" if bets == [] else bets[-1]
-        s = "Current Bet: {b}\n" "Current Dices: {d}".format(
-            b=b, d=self.current_roll
-        )
+        s = "Current Dices: {d}".format(b=b, d=self.current_roll)
         print(s)
 
         if not bets:
